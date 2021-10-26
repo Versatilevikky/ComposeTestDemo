@@ -3,9 +3,9 @@ package com.gv.composetestdemo
 //import dagger.hilt.android.AndroidEntryPoint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.gv.composetestdemo.ViewModel.UserListViewModel
 import com.gv.composetestdemo.ui.UserList
@@ -21,7 +21,9 @@ class MainActivity : ComponentActivity() {
             ComposetestdemoTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    UserList()
+                    UserList{
+                        startActivity(InfoActivity.intent(this,it))
+                    }
             }
 
 

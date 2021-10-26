@@ -38,7 +38,7 @@ class UserFetcher @Inject constructor( ) {
             }
 
             override fun onResponse(call: Call, response: Response) {
-
+                Log.d("UserFetcher","respomse----")
 
                     responseResult = gson.fromJson(response.body?.string(), UserResponse::class.java)
                     Log.d("UserFetcher",responseResult.toString())

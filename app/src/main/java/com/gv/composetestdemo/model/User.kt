@@ -1,4 +1,6 @@
 package com.gv.composetestdemo.model
+import java.io.Serializable;
+
 
 data class User(
     val gender: String,
@@ -6,4 +8,4 @@ data class User(
     val phone:String,
     val email:String,
     val nat:String
-)
+): Serializable
