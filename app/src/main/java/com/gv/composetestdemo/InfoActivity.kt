@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,14 +43,15 @@ import com.skydoves.landscapist.glide.GlideImage
 
 class InfoActivity : ComponentActivity() {
 
-    companion object{
+    companion object {
         private const val UserInfo = "userInfo"
-        fun intent(context: Context, user: User)=
-            Intent(context,InfoActivity::class.java).apply {
-                putExtra(UserInfo,user)
+        fun intent(context: Context, user: User) =
+            Intent(context, InfoActivity::class.java).apply {
+                putExtra(UserInfo, user)
             }
     }
-    private val user : User by lazy {
+
+    private val user: User by lazy {
         intent?.getSerializableExtra(UserInfo) as User
     }
 
@@ -60,7 +62,7 @@ class InfoActivity : ComponentActivity() {
             ComposetestdemoTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                   ViewMoreInfo(userInfo = user)
+                    ViewMoreInfo(userInfo = user)
                 }
             }
         }
@@ -68,11 +70,16 @@ class InfoActivity : ComponentActivity() {
 }
 
 @Composable
-fun ViewMoreInfo(userInfo:User){
-    var userListViewModel: UserListViewModel = viewModel()
+fun ViewMoreInfo(userInfo: User) {
+    val userListViewModel: UserListViewModel = viewModel()
     val scrollState = rememberScrollState()
-    var imageUrl= userListViewModel.userComponent.userListProvider().getUserImage().large
-    var isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        userListViewModel.userComponent.userListProvider().getUserImage()
+    }
+
+    val imageUrl = userListViewModel.userComponent.userListProvider().userFetcher.userImage.observeAsState()
+    val isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -92,19 +99,21 @@ fun ViewMoreInfo(userInfo:User){
             Spacer(modifier = Modifier.height(16.dp))
             isLoading.value?.let { CircularIndeterminateProgressBar(it) }
 
-        Image(
-            painter = rememberImagePainter(
-            data = imageUrl,
-            onExecute = ImagePainter.ExecuteCallback { _, _ -> true },
-            builder = {
-                crossfade(true)
-                placeholder(R.drawable.user)
-                transformations(CircleCropTransformation())
+            imageUrl.value?.let {
+                Image(
+                    painter = rememberImagePainter(
+                        data = it.results[0].picture,
+                        onExecute = ImagePainter.ExecuteCallback { _, _ -> true },
+                        builder = {
+                            crossfade(true)
+                            placeholder(R.drawable.user)
+                            transformations(CircleCropTransformation())
+                        }
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.size(128.dp)
+                )
             }
-        ),
-        contentDescription = null,
-        modifier = Modifier.size(128.dp)
-    )
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
