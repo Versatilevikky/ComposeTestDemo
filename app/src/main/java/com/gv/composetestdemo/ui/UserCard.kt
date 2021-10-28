@@ -37,7 +37,7 @@ fun UserCard(user: User,selectedItem: (User) -> Unit){
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxWidth()
-//                .clickable(onClick = {selectedItem(user)})
+                .clickable(onClick = {selectedItem(user)})
 
             ,
             verticalAlignment = Alignment.CenterVertically

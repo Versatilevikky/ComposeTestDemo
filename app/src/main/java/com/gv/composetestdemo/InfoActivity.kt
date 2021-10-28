@@ -2,28 +2,43 @@ package com.gv.composetestdemo
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Transition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.ImagePainter
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
+import com.gv.composetestdemo.ViewModel.UserListViewModel
 import com.gv.composetestdemo.model.User
+import com.gv.composetestdemo.ui.CircularIndeterminateProgressBar
 import com.gv.composetestdemo.ui.theme.ComposetestdemoTheme
+import com.skydoves.landscapist.coil.CoilImage
+import com.skydoves.landscapist.glide.GlideImage
 
 class InfoActivity : ComponentActivity() {
 
@@ -54,7 +69,11 @@ class InfoActivity : ComponentActivity() {
 
 @Composable
 fun ViewMoreInfo(userInfo:User){
+    var userListViewModel: UserListViewModel = viewModel()
     val scrollState = rememberScrollState()
+    var imageUrl= userListViewModel.userComponent.userListProvider().getUserImage().large
+    var isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
+
     Card(
         modifier = Modifier.padding(10.dp),
         elevation = 10.dp,
@@ -66,35 +85,47 @@ fun ViewMoreInfo(userInfo:User){
                 .verticalScroll(scrollState)
                 .padding(10.dp)
         ) {
-//            Image(
-//                painter = painterResource(id = R.drawable.ic_launcher_background),
-////                contentDescription = null,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .clip(shape = RoundedCornerShape(4.dp)),
-//                contentScale = ContentScale.Fit
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "test",
-//                style = MaterialTheme.typography.h3
+                text = "Image Below",
+                style = MaterialTheme.typography.h3
             )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Text(
-//                text = tvShow.overview,
-//                style = MaterialTheme.typography.h5
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Text(
-//                text = "Original release : ${tvShow.year}",
-//                style = MaterialTheme.typography.h5
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Text(
-//                text = "IMDB : ${tvShow.rating}",
-//                style = MaterialTheme.typography.h5
-//            )
+            Spacer(modifier = Modifier.height(16.dp))
+            isLoading.value?.let { CircularIndeterminateProgressBar(it) }
 
+        Image(
+            painter = rememberImagePainter(
+            data = imageUrl,
+            onExecute = ImagePainter.ExecuteCallback { _, _ -> true },
+            builder = {
+                crossfade(true)
+                placeholder(R.drawable.user)
+                transformations(CircleCropTransformation())
+            }
+        ),
+        contentDescription = null,
+        modifier = Modifier.size(128.dp)
+    )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = userInfo.name.first,
+                style = MaterialTheme.typography.h3
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = userInfo.gender,
+                style = MaterialTheme.typography.h5
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "mail : ${userInfo.email}",
+                style = MaterialTheme.typography.h5
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Phone : ${userInfo.phone}",
+                style = MaterialTheme.typography.h5
+            )
         }
     }
 }

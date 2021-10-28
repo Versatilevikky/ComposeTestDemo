@@ -1,6 +1,8 @@
 package com.gv.composetestdemo.ViewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.gv.composetestdemo.data.UserFetcher
 import com.gv.composetestdemo.di.DaggerUserComponent
@@ -17,4 +19,5 @@ class UserListViewModel :ViewModel(){
     val userComponent:UserComponent by lazy {
         DaggerUserComponent.create()
     }
+
 }
