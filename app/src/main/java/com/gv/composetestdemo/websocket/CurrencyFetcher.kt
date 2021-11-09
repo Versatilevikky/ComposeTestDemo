@@ -76,8 +76,9 @@ class CurrencyFetcher @Inject constructor() {
         message?.let {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<BitcoinTicker> = moshi.adapter(BitcoinTicker::class.java)
-            val bitcoin = adapter.fromJson(message)
+            var bitcoin = adapter.fromJson(message)
             _bitcoinPrice.postValue(bitcoin)
+            Log.d("Coin BitCoin","bitcoin "+bitcoinPrice.value?.price)
 
         }
     }

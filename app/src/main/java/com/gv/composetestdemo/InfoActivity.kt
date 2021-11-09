@@ -92,7 +92,7 @@ fun ViewMoreInfo(userInfo: User) {
 
     val imageUrl = userListViewModel.userComponent.userListProvider().userFetcher.userImage.observeAsState()
     val isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
-   val bitcoinPrice= userListViewModel.userComponent.currencyFetcher().bitcoinPrice.observeAsState()
+     val bitcoinPrice= userListViewModel.userComponent.currencyFetcher().bitcoinPrice.observeAsState()
     Column {
 
 
@@ -155,18 +155,25 @@ fun ViewMoreInfo(userInfo: User) {
             }
 
         }
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),horizontalArrangement =Arrangement.Center  ){
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), horizontalArrangement = Arrangement.Center
+        ) {
 //            instagramIcon()
 //            messengerIcon()
             getGooglePhotosIcon()
         }
-
         Text(
-            text = "1 BTC: ${bitcoinPrice.value!!.price} €",
+            text = "BTC >",
             style = MaterialTheme.typography.h5
         )
+        bitcoinPrice.value?.let {
+            Text(
+                text = "1 BTC: ${it.price} €",
+                style = MaterialTheme.typography.h5
+            )
+        }
     }
 }
 
