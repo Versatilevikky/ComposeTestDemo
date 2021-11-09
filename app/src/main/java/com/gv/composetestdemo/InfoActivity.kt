@@ -36,15 +36,11 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.gv.composetestdemo.ViewModel.InfoViewModel
-import com.gv.composetestdemo.ViewModel.UserListViewModel
-
-import com.gv.composetestdemo.di.DaggerUserComponent
 import com.gv.composetestdemo.model.User
 import com.gv.composetestdemo.ui.CircularIndeterminateProgressBar
 import com.gv.composetestdemo.ui.SnackBar
 import com.gv.composetestdemo.ui.SnackBarProvider
 import com.gv.composetestdemo.ui.theme.ComposetestdemoTheme
-import com.gv.composetestdemo.websocket.CurrencyFetcher
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
@@ -114,8 +110,8 @@ fun ViewMoreInfo(userInfo: User) {
     val imageUrl = infoViewModel.infoComponent.userListProvider().userFetcher.userImage.observeAsState()
     val isLoading =  infoViewModel.infoComponent.userListProvider().userFetcher.loading.observeAsState()
      val bitcoinPrice= infoViewModel.infoComponent.currencyProvider().currencyFetcher.bitcoinPrice.observeAsState()
-    var counter = infoViewModel.buttonClicked.observeAsState()
-    var lastvalue=0
+    val counter = infoViewModel.buttonClicked.observeAsState()
+    val showSnackBar = infoViewModel.showSnackBar.observeAsState()
     val scope = rememberCoroutineScope()
     Column {
 
@@ -183,11 +179,7 @@ fun ViewMoreInfo(userInfo: User) {
             modifier = Modifier
                 .padding(16.dp), horizontalArrangement = Arrangement.Start
         ) {
-//            instagramIcon()
-//            messengerIcon()
             getGooglePhotosIcon()
-
-
             bitcoinPrice.value?.let {
                 Text(
                     text = "1 BTC: ${it.price} €",
@@ -205,8 +197,8 @@ fun ViewMoreInfo(userInfo: User) {
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp),
                 onClick = {
-                    showSnackBar(it.toString()+" Time Clicked",snackbarHostState,scope,snackbarProvider)
                     infoViewModel.buttonClicked.value=it+1
+                    infoViewModel.showSnackBar.value=true
 
                 }) {
                 Text(text = it.toString())
@@ -215,10 +207,10 @@ fun ViewMoreInfo(userInfo: User) {
 
         }
 
-        if(counter.value!=lastvalue){
-
-            lastvalue=counter.value!!.toInt()
-        }
+        if(showSnackBar.value!!){
+            showSnackBar(counter.value.toString()+" Time Clicked",snackbarHostState,scope,snackbarProvider)
+            infoViewModel.showSnackBar.value=false
+            }
         SnackBar(
             snackbarHostState = snackbarHostState,
             onActionClick = {
