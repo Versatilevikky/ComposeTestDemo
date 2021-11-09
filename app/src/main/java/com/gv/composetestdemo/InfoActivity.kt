@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 class InfoActivity : ComponentActivity() {
 
-
+    var snackbarProvider = SnackBarProvider()
     private val infoViewModel: InfoViewModel by viewModels()
 
     companion object {
@@ -69,7 +69,7 @@ class InfoActivity : ComponentActivity() {
         setContent {
             ComposetestdemoTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    ViewMoreInfo(userInfo = user)
+                    ViewMoreInfo(userInfo = user,snackbarProvider)
                 }
             }
         }
@@ -89,10 +89,10 @@ class InfoActivity : ComponentActivity() {
 }
 
 @Composable
-fun ViewMoreInfo(userInfo: User) {
+fun ViewMoreInfo(userInfo: User,snackbarProvider: SnackBarProvider) {
     val infoViewModel:InfoViewModel= viewModel()
     val scrollState = rememberScrollState()
-    var snackbarProvider = SnackBarProvider()
+//    var snackbarProvider = SnackBarProvider()
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = Unit) {
         infoViewModel.infoComponent.userListProvider().getUserImage()

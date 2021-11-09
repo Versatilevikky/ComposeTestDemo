@@ -50,6 +50,8 @@ class ExampleInstrumentedTest {
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
         composeTestRule.onNodeWithContentDescription("button").performClick()
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
+        composeTestRule.onNodeWithText("DisMiss").performClick()
+        composeTestRule.onRoot().printToLog("Test-UserFetcher")
     }
 
     @After
