@@ -1,6 +1,8 @@
 package com.gv.composetestdemo.di
 
+import com.gv.composetestdemo.InfoActivity
 import com.gv.composetestdemo.ViewModel.UserListProvider
+import com.gv.composetestdemo.websocket.CurrencyFetcher
 import dagger.Component
 import javax.inject.Singleton
 
@@ -16,6 +18,9 @@ interface UserComponent {
     }
 
     fun userListProvider():UserListProvider
+    fun currencyFetcher():CurrencyFetcher
+    fun inject(infoActivity: InfoActivity)
+
 
 
 }

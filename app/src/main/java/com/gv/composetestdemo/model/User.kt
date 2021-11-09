@@ -5,7 +5,7 @@ import java.io.Serializable;
 data class User(
     val gender: String,
     val name: Name,
-    val phone:String,
+    var phone:String,
     val email:String,
     val nat:String
 ): Serializable

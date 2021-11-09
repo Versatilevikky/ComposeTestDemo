@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.gv.composetestdemo.ViewModel.UserListViewModel
 import com.gv.composetestdemo.model.UserImage
 import com.gv.composetestdemo.model.UserResponse
+import com.gv.myapplication.moduleA.SimpleIdlingResource
 import okhttp3.*
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
@@ -47,7 +48,7 @@ class UserFetcher @Inject constructor() {
         val request = Request.Builder().url(API_URL).build()
 
         val countDownLatch = CountDownLatch(1)
-
+        SimpleIdlingResource().getIdlingResource().setIdleState(false)
         _loading.value = (true)
 
         client.newCall(request = request).enqueue(object : Callback {
@@ -63,6 +64,7 @@ class UserFetcher @Inject constructor() {
                 countDownLatch.countDown()
                 _userResponse.postValue(responseResult)
                 _loading.postValue(false)
+                SimpleIdlingResource().getIdlingResource().setIdleState(true)
             }
         })
 
@@ -76,6 +78,7 @@ class UserFetcher @Inject constructor() {
 
     fun getUserImage() {
         val request = Request.Builder().url(IMAGE_URL).build()
+        SimpleIdlingResource().getIdlingResource().setIdleState(false)
         _loading.value = (true)
 
         val countDownLatch = CountDownLatch(1)
@@ -91,6 +94,7 @@ class UserFetcher @Inject constructor() {
                 countDownLatch.countDown()
                 _userImage.postValue(responseResult)
                 _loading.postValue(false)
+                SimpleIdlingResource().getIdlingResource().setIdleState(true)
             }
         })
     }

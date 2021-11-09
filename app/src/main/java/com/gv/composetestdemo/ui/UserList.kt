@@ -32,9 +32,13 @@ fun UserList(selectedItem: (User) -> Unit) {
         Log.d("UserFetcher", " ${isLoading.value}")
     }
 
-    isLoading.value?.let { CircularIndeterminateProgressBar(isDisplayed = it) }
+    isLoading.value?.let {
+
+        CircularIndeterminateProgressBar(isDisplayed = it)
+    }
 
     userList.value?.let {
+        it.results.add(0,userViewModel.tempUser)
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {

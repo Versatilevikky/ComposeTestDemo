@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "composetestdemo"
 include ':app'
+include ':moduleA'

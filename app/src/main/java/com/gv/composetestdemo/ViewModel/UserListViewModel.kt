@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.gv.composetestdemo.data.UserFetcher
 import com.gv.composetestdemo.di.DaggerUserComponent
 import com.gv.composetestdemo.di.UserComponent
+import com.gv.composetestdemo.model.Name
 import com.gv.composetestdemo.model.User
 import com.gv.composetestdemo.model.UserResponse
 import javax.inject.Inject
@@ -19,5 +20,8 @@ class UserListViewModel :ViewModel(){
     val userComponent:UserComponent by lazy {
         DaggerUserComponent.create()
     }
+
+    private var name:Name=Name("Test","X","Mr")
+    var tempUser:User = User("male",name,"9999","test@test.com","IN")
 
 }
