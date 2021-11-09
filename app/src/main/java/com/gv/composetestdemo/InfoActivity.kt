@@ -3,8 +3,10 @@ package com.gv.composetestdemo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -15,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +37,7 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import com.gv.composetestdemo.ViewModel.CurrencyViewModel
 import com.gv.composetestdemo.ViewModel.UserListViewModel
+import com.gv.composetestdemo.di.CurrencyComponent
 import com.gv.composetestdemo.di.DaggerCurrencyComponent
 import com.gv.composetestdemo.di.DaggerUserComponent
 import com.gv.composetestdemo.model.User
@@ -44,8 +48,8 @@ import javax.inject.Inject
 
 class InfoActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var currencyFetcher:CurrencyFetcher
+
+    private val currencyViewModel: CurrencyViewModel by viewModels()
 
     companion object {
         private const val UserInfo = "userInfo"
@@ -62,6 +66,8 @@ class InfoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             ComposetestdemoTheme {
                 // A surface container using the 'background' color from the theme
@@ -74,13 +80,16 @@ class InfoActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        DaggerCurrencyComponent.create().inject(this)
-        currencyFetcher.initWebSocket()
+        currencyViewModel.currencyComponent.currencyProvider().currencyFetcher.initWebSocket()
+//        Log.d("CurrencyComponent","what "+what)
+//        Log.d("CurrencyComponent","currencyProvider "+currencyProvider)
+        Log.d("CurrencyComponent","currencyFetcher "+currencyViewModel.currencyComponent.currencyProvider().currencyFetcher)
     }
 
     override fun onPause() {
         super.onPause()
-        currencyFetcher.webSocketClient.close()
+        currencyViewModel.currencyComponent.currencyProvider().currencyFetcher.webSocketClient.close()
+//        currencyComponent.currencyProvider().currencyFetcher.webSocketClient.close()
     }
 }
 
@@ -92,12 +101,16 @@ fun ViewMoreInfo(userInfo: User) {
 
     LaunchedEffect(key1 = Unit) {
         userListViewModel.userComponent.userListProvider().getUserImage()
-//        userListViewModel.userComponent.currencyFetcher().initWebSocket()
+
+
+    }
+    SideEffect {
+        Log.d("CurrencyComponent","Compose --"+currencyViewModel.currencyComponent.currencyProvider().currencyFetcher)
     }
 
     val imageUrl = userListViewModel.userComponent.userListProvider().userFetcher.userImage.observeAsState()
     val isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
-     val bitcoinPrice= currencyViewModel.currencyComponent.currencyFetcher().bitcoinPrice.observeAsState()
+     val bitcoinPrice= currencyViewModel.currencyComponent.currencyProvider().currencyFetcher.bitcoinPrice.observeAsState()
     Column {
 
 
