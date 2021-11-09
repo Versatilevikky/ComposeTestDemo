@@ -29,16 +29,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.gv.composetestdemo.ViewModel.CurrencyViewModel
+import com.gv.composetestdemo.ViewModel.InfoViewModel
 import com.gv.composetestdemo.ViewModel.UserListViewModel
-import com.gv.composetestdemo.di.CurrencyComponent
-import com.gv.composetestdemo.di.DaggerCurrencyComponent
+
 import com.gv.composetestdemo.di.DaggerUserComponent
 import com.gv.composetestdemo.model.User
 import com.gv.composetestdemo.ui.CircularIndeterminateProgressBar
@@ -49,7 +50,7 @@ import javax.inject.Inject
 class InfoActivity : ComponentActivity() {
 
 
-    private val currencyViewModel: CurrencyViewModel by viewModels()
+    private val infoViewModel: InfoViewModel by viewModels()
 
     companion object {
         private const val UserInfo = "userInfo"
@@ -80,37 +81,36 @@ class InfoActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        currencyViewModel.currencyComponent.currencyProvider().currencyFetcher.initWebSocket()
+        infoViewModel.infoComponent.currencyProvider().currencyFetcher.initWebSocket()
 //        Log.d("CurrencyComponent","what "+what)
 //        Log.d("CurrencyComponent","currencyProvider "+currencyProvider)
-        Log.d("CurrencyComponent","currencyFetcher "+currencyViewModel.currencyComponent.currencyProvider().currencyFetcher)
+        Log.d("CurrencyComponent","currencyFetcher "+infoViewModel.infoComponent.currencyProvider().currencyFetcher)
     }
 
     override fun onPause() {
         super.onPause()
-        currencyViewModel.currencyComponent.currencyProvider().currencyFetcher.webSocketClient.close()
+        infoViewModel.infoComponent.currencyProvider().currencyFetcher.webSocketClient.close()
 //        currencyComponent.currencyProvider().currencyFetcher.webSocketClient.close()
     }
 }
 
 @Composable
 fun ViewMoreInfo(userInfo: User) {
-    val userListViewModel: UserListViewModel = viewModel()
-    val currencyViewModel:CurrencyViewModel= viewModel()
+    val infoViewModel:InfoViewModel= viewModel()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = Unit) {
-        userListViewModel.userComponent.userListProvider().getUserImage()
+        infoViewModel.infoComponent.userListProvider().getUserImage()
 
 
     }
     SideEffect {
-        Log.d("CurrencyComponent","Compose --"+currencyViewModel.currencyComponent.currencyProvider().currencyFetcher)
+        Log.d("CurrencyComponent","Compose --"+infoViewModel.infoComponent.currencyProvider().currencyFetcher)
     }
 
-    val imageUrl = userListViewModel.userComponent.userListProvider().userFetcher.userImage.observeAsState()
-    val isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
-     val bitcoinPrice= currencyViewModel.currencyComponent.currencyProvider().currencyFetcher.bitcoinPrice.observeAsState()
+    val imageUrl = infoViewModel.infoComponent.userListProvider().userFetcher.userImage.observeAsState()
+    val isLoading =  infoViewModel.infoComponent.userListProvider().userFetcher.loading.observeAsState()
+     val bitcoinPrice= infoViewModel.infoComponent.currencyProvider().currencyFetcher.bitcoinPrice.observeAsState()
     Column {
 
 
@@ -190,6 +190,10 @@ fun ViewMoreInfo(userInfo: User) {
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
+        }
+        Button(modifier = Modifier.semantics { contentDescription = "button" }.align(Alignment.CenterHorizontally).padding(16.dp), onClick = {
+        }) {
+            Text(text = "Button")
         }
     }
 }
