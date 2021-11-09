@@ -1,10 +1,7 @@
 package com.gv.composetestdemo
 
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
@@ -44,12 +41,14 @@ class ExampleInstrumentedTest {
 //        })
     }
     @Test
-    fun useAppContext() {
+    fun test() {
         // Context of the app under test.
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
         composeTestRule.onNodeWithText("Test").performClick()
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
         composeTestRule.onNodeWithText("Phone : 9999").assertExists()
+        composeTestRule.onRoot().printToLog("Test-UserFetcher")
+        composeTestRule.onNodeWithContentDescription("button").performClick()
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
     }
 

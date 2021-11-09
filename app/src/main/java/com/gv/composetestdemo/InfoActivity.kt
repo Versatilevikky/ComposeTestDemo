@@ -68,7 +68,6 @@ class InfoActivity : ComponentActivity() {
 
         setContent {
             ComposetestdemoTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     ViewMoreInfo(userInfo = user)
                 }
@@ -79,8 +78,6 @@ class InfoActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         infoViewModel.infoComponent.currencyProvider().currencyFetcher.initWebSocket()
-//        Log.d("CurrencyComponent","what "+what)
-//        Log.d("CurrencyComponent","currencyProvider "+currencyProvider)
         Log.d("CurrencyComponent","currencyFetcher "+infoViewModel.infoComponent.currencyProvider().currencyFetcher)
     }
 
