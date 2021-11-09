@@ -18,8 +18,6 @@ interface UserComponent {
     }
 
     fun userListProvider():UserListProvider
-    fun currencyFetcher():CurrencyFetcher
-    fun inject(infoActivity: InfoActivity)
 
 
 

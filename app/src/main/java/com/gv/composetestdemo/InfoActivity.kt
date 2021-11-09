@@ -26,12 +26,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.gv.composetestdemo.ViewModel.CurrencyViewModel
 import com.gv.composetestdemo.ViewModel.UserListViewModel
+import com.gv.composetestdemo.di.DaggerCurrencyComponent
 import com.gv.composetestdemo.di.DaggerUserComponent
 import com.gv.composetestdemo.model.User
 import com.gv.composetestdemo.ui.CircularIndeterminateProgressBar
@@ -59,7 +62,6 @@ class InfoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DaggerUserComponent.builder().build().inject(this)
         setContent {
             ComposetestdemoTheme {
                 // A surface container using the 'background' color from the theme
@@ -72,6 +74,7 @@ class InfoActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        DaggerCurrencyComponent.create().inject(this)
         currencyFetcher.initWebSocket()
     }
 
@@ -84,15 +87,17 @@ class InfoActivity : ComponentActivity() {
 @Composable
 fun ViewMoreInfo(userInfo: User) {
     val userListViewModel: UserListViewModel = viewModel()
+    val currencyViewModel:CurrencyViewModel= viewModel()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = Unit) {
         userListViewModel.userComponent.userListProvider().getUserImage()
+//        userListViewModel.userComponent.currencyFetcher().initWebSocket()
     }
 
     val imageUrl = userListViewModel.userComponent.userListProvider().userFetcher.userImage.observeAsState()
     val isLoading = userListViewModel.userComponent.userListProvider().userFetcher.loading.observeAsState()
-     val bitcoinPrice= userListViewModel.userComponent.currencyFetcher().bitcoinPrice.observeAsState()
+     val bitcoinPrice= currencyViewModel.currencyComponent.currencyFetcher().bitcoinPrice.observeAsState()
     Column {
 
 
@@ -164,14 +169,13 @@ fun ViewMoreInfo(userInfo: User) {
 //            messengerIcon()
             getGooglePhotosIcon()
         }
-        Text(
-            text = "BTC >",
-            style = MaterialTheme.typography.h5
-        )
+
         bitcoinPrice.value?.let {
             Text(
                 text = "1 BTC: ${it.price} €",
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
         }
     }
