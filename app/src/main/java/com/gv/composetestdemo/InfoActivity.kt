@@ -15,9 +15,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,8 +41,11 @@ import com.gv.composetestdemo.ViewModel.UserListViewModel
 import com.gv.composetestdemo.di.DaggerUserComponent
 import com.gv.composetestdemo.model.User
 import com.gv.composetestdemo.ui.CircularIndeterminateProgressBar
+import com.gv.composetestdemo.ui.SnackBar
+import com.gv.composetestdemo.ui.SnackBarProvider
 import com.gv.composetestdemo.ui.theme.ComposetestdemoTheme
 import com.gv.composetestdemo.websocket.CurrencyFetcher
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 class InfoActivity : ComponentActivity() {
@@ -98,7 +99,8 @@ class InfoActivity : ComponentActivity() {
 fun ViewMoreInfo(userInfo: User) {
     val infoViewModel:InfoViewModel= viewModel()
     val scrollState = rememberScrollState()
-
+    var snackbarProvider = SnackBarProvider()
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = Unit) {
         infoViewModel.infoComponent.userListProvider().getUserImage()
 
@@ -108,9 +110,13 @@ fun ViewMoreInfo(userInfo: User) {
         Log.d("CurrencyComponent","Compose --"+infoViewModel.infoComponent.currencyProvider().currencyFetcher)
     }
 
+
     val imageUrl = infoViewModel.infoComponent.userListProvider().userFetcher.userImage.observeAsState()
     val isLoading =  infoViewModel.infoComponent.userListProvider().userFetcher.loading.observeAsState()
      val bitcoinPrice= infoViewModel.infoComponent.currencyProvider().currencyFetcher.bitcoinPrice.observeAsState()
+    var counter = infoViewModel.buttonClicked.observeAsState()
+    var lastvalue=0
+    val scope = rememberCoroutineScope()
     Column {
 
 
@@ -175,28 +181,66 @@ fun ViewMoreInfo(userInfo: User) {
         }
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp), horizontalArrangement = Arrangement.Center
+                .padding(16.dp), horizontalArrangement = Arrangement.Start
         ) {
 //            instagramIcon()
 //            messengerIcon()
             getGooglePhotosIcon()
+
+
+            bitcoinPrice.value?.let {
+                Text(
+                    text = "1 BTC: ${it.price} €",
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
 
-        bitcoinPrice.value?.let {
-            Text(
-                text = "1 BTC: ${it.price} €",
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+        counter.value?.let {
+
+            Button(modifier = Modifier
+                .semantics { contentDescription = "button" }
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp),
+                onClick = {
+                    showSnackBar(it.toString()+" Time Clicked",snackbarHostState,scope,snackbarProvider)
+                    infoViewModel.buttonClicked.value=it+1
+
+                }) {
+                Text(text = it.toString())
+            }
+
+
         }
-        Button(modifier = Modifier.semantics { contentDescription = "button" }.align(Alignment.CenterHorizontally).padding(16.dp), onClick = {
-        }) {
-            Text(text = "Button")
+
+        if(counter.value!=lastvalue){
+
+            lastvalue=counter.value!!.toInt()
         }
+        SnackBar(
+            snackbarHostState = snackbarHostState,
+            onActionClick = {
+                snackbarProvider.dismissSnackBar()
+            })
     }
 }
+
+fun showSnackBar(msg:String, snackbarHostState: SnackbarHostState, scope: CoroutineScope, snackbarProvider: SnackBarProvider) {
+
+
+    snackbarProvider.showSnackBar(
+        scope,
+        snackbarHostState,
+         msg,
+        "DisMiss",
+        SnackbarDuration.Short
+    )
+
+
+}
+
 
 @Composable
 fun instagramIcon() {

@@ -16,5 +16,5 @@ class InfoViewModel: ViewModel() {
 
 
     private val _buttonClicked: MutableLiveData<Int> = MutableLiveData(1)
-    val buttonClicked :LiveData<Int> = _buttonClicked
+    val buttonClicked :MutableLiveData<Int> = _buttonClicked
 }
