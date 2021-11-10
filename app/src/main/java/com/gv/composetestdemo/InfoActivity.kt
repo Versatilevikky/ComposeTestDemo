@@ -41,6 +41,7 @@ import com.gv.composetestdemo.ui.CircularIndeterminateProgressBar
 import com.gv.composetestdemo.ui.SnackBar
 import com.gv.composetestdemo.ui.SnackBarProvider
 import com.gv.composetestdemo.ui.theme.ComposetestdemoTheme
+import com.gv.myapplication.moduleA.SimpleIdlingResource
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
@@ -78,7 +79,7 @@ class InfoActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         infoViewModel.infoComponent.currencyProvider().currencyFetcher.initWebSocket()
-        Log.d("CurrencyComponent","currencyFetcher "+infoViewModel.infoComponent.currencyProvider().currencyFetcher)
+        Log.d("Coin","onResume ")
     }
 
     override fun onPause() {
@@ -107,6 +108,7 @@ fun ViewMoreInfo(userInfo: User,snackbarProvider: SnackBarProvider) {
     val imageUrl = infoViewModel.infoComponent.userListProvider().userFetcher.userImage.observeAsState()
     val isLoading =  infoViewModel.infoComponent.userListProvider().userFetcher.loading.observeAsState()
      val bitcoinPrice= infoViewModel.infoComponent.currencyProvider().currencyFetcher.bitcoinPrice.observeAsState()
+    val isCurrencyLoading =  infoViewModel.infoComponent.currencyProvider().currencyFetcher.loading.observeAsState()
     val counter = infoViewModel.buttonClicked.observeAsState()
     val showSnackBar = infoViewModel.showSnackBar.observeAsState()
     val scope = rememberCoroutineScope()
@@ -177,9 +179,24 @@ fun ViewMoreInfo(userInfo: User,snackbarProvider: SnackBarProvider) {
                 .padding(16.dp), horizontalArrangement = Arrangement.Start
         ) {
             getGooglePhotosIcon()
+            isCurrencyLoading.value?.let {
+
+                if(true){
+                    SimpleIdlingResource().getIdlingResource().setIdleState(false)
+                }
+                else{
+                    SimpleIdlingResource().getIdlingResource().setIdleState(true)
+                }
+                CircularIndeterminateProgressBar(it)
+            }
             bitcoinPrice.value?.let {
                 Text(
-                    text = "1 BTC: ${it.price} €",
+                    text = "1 BTC :",
+                    style = MaterialTheme.typography.h5,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "${it.price} €",
                     style = MaterialTheme.typography.h5,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center

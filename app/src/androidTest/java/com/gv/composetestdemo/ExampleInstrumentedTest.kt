@@ -48,8 +48,10 @@ class ExampleInstrumentedTest {
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
         composeTestRule.onNodeWithText("Phone : 9999").assertExists()
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
+        composeTestRule.onNodeWithText("1 BTC :").assertExists()
         composeTestRule.onNodeWithContentDescription("button").performClick()
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
+        composeTestRule.onNodeWithText("2 Time Clicked").assertExists()
         composeTestRule.onNodeWithText("DisMiss").performClick()
         composeTestRule.onRoot().printToLog("Test-UserFetcher")
     }

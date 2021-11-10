@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gv.composetestdemo.model.BitcoinTicker
+import com.gv.myapplication.moduleA.SimpleIdlingResource
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.java_websocket.client.WebSocketClient
@@ -27,16 +28,22 @@ class CurrencyFetcher @Inject constructor() {
 
     private val _bitcoinPrice: MutableLiveData<BitcoinTicker> = MutableLiveData()
     val bitcoinPrice: LiveData<BitcoinTicker> = _bitcoinPrice
+    private val _loading: MutableLiveData<Boolean> = MutableLiveData()
+    val loading: LiveData<Boolean> = _loading
 
-     lateinit var webSocketClient: WebSocketClient
+    lateinit var webSocketClient: WebSocketClient
      fun initWebSocket() {
         val coinbaseUri: URI? = URI(WEB_SOCKET_URL)
+         SimpleIdlingResource().getIdlingResource().setIdleState(false)
+         _loading.value=true
 
         createWebSocketClient(coinbaseUri)
 
         val socketFactory: SSLSocketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
         webSocketClient.setSocketFactory(socketFactory)
         webSocketClient.connect()
+
+
     }
 
     private fun createWebSocketClient(coinbaseUri: URI?) {
@@ -44,12 +51,15 @@ class CurrencyFetcher @Inject constructor() {
 
             override fun onOpen(handshakedata: ServerHandshake?) {
                 Log.d(TAG, "onOpen")
+                Log.d("Coin","onResume ")
                 subscribe()
             }
 
             override fun onMessage(message: String?) {
                 Log.d(TAG, "onMessage: $message")
                 setUpBtcPriceText(message)
+                _loading.value=false
+                SimpleIdlingResource().getIdlingResource().setIdleState(true)
             }
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -77,7 +87,10 @@ class CurrencyFetcher @Inject constructor() {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<BitcoinTicker> = moshi.adapter(BitcoinTicker::class.java)
             var bitcoin = adapter.fromJson(message)
-            _bitcoinPrice.postValue(bitcoin)
+
+                _bitcoinPrice.postValue(bitcoin)
+                _loading.postValue(false)
+
             Log.d("Coin BitCoin","bitcoin "+bitcoinPrice.value?.price)
 
         }
