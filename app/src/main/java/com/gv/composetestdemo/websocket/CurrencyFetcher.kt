@@ -12,6 +12,7 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
 import java.net.URI
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 import javax.inject.Singleton
 import javax.net.ssl.SSLSocketFactory
@@ -33,8 +34,11 @@ class CurrencyFetcher @Inject constructor() {
 
     lateinit var webSocketClient: WebSocketClient
      fun initWebSocket() {
-        val coinbaseUri: URI? = URI(WEB_SOCKET_URL)
-         SimpleIdlingResource().getIdlingResource().setIdleState(false)
+         Log.d("TestStatus","Currency Idl set false : before- " +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+         SimpleIdlingResource().increment()
+         Log.d("TestStatus","Currency Idl afterset false : after -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+
+         val coinbaseUri: URI? = URI(WEB_SOCKET_URL)
          _loading.value=true
 
         createWebSocketClient(coinbaseUri)
@@ -42,7 +46,6 @@ class CurrencyFetcher @Inject constructor() {
         val socketFactory: SSLSocketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
         webSocketClient.setSocketFactory(socketFactory)
         webSocketClient.connect()
-
 
     }
 
@@ -58,22 +61,32 @@ class CurrencyFetcher @Inject constructor() {
             override fun onMessage(message: String?) {
                 Log.d(TAG, "onMessage: $message")
                 setUpBtcPriceText(message)
-                _loading.value=false
-                SimpleIdlingResource().getIdlingResource().setIdleState(true)
+                _loading.postValue(false)
+                Log.d("TestStatus","Currency Idl onMessage set true : before -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+                SimpleIdlingResource().decrement()
+                Log.d("TestStatus","Currency Idl onMessage set true : after -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+
             }
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
                 Log.d(TAG, "onClose")
                 unsubscribe()
+                Log.d("TestStatus","Currency Idl onClose set true : before -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+                SimpleIdlingResource().decrement()
+                Log.d("TestStatus","Currency Idl onClose set true : after -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
             }
 
             override fun onError(ex: Exception?) {
                 Log.e(TAG, "onError: ${ex?.message}")
+                Log.d("TestStatus","Currency Idl OnError set true : before -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+                SimpleIdlingResource().decrement()
+                Log.d("TestStatus","Currency Idl OnError set true : after -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
             }
 
         }
     }
     private fun subscribe() {
+
         webSocketClient.send(
             "{\n" +
                     "    \"type\": \"subscribe\",\n" +
@@ -87,10 +100,7 @@ class CurrencyFetcher @Inject constructor() {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<BitcoinTicker> = moshi.adapter(BitcoinTicker::class.java)
             var bitcoin = adapter.fromJson(message)
-
-                _bitcoinPrice.postValue(bitcoin)
-                _loading.postValue(false)
-
+            _bitcoinPrice.postValue(bitcoin)
             Log.d("Coin BitCoin","bitcoin "+bitcoinPrice.value?.price)
 
         }

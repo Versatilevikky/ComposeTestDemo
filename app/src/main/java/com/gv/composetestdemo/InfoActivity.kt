@@ -87,6 +87,7 @@ class InfoActivity : ComponentActivity() {
         infoViewModel.infoComponent.currencyProvider().currencyFetcher.webSocketClient.close()
 //        currencyComponent.currencyProvider().currencyFetcher.webSocketClient.close()
     }
+
 }
 
 @Composable
@@ -98,7 +99,7 @@ fun ViewMoreInfo(userInfo: User,snackbarProvider: SnackBarProvider) {
     LaunchedEffect(key1 = Unit) {
         infoViewModel.infoComponent.userListProvider().getUserImage()
 
-
+//        infoViewModel.infoComponent.currencyProvider().currencyFetcher.initWebSocket()
     }
     SideEffect {
         Log.d("CurrencyComponent","Compose --"+infoViewModel.infoComponent.currencyProvider().currencyFetcher)
@@ -180,13 +181,6 @@ fun ViewMoreInfo(userInfo: User,snackbarProvider: SnackBarProvider) {
         ) {
             getGooglePhotosIcon()
             isCurrencyLoading.value?.let {
-
-                if(true){
-                    SimpleIdlingResource().getIdlingResource().setIdleState(false)
-                }
-                else{
-                    SimpleIdlingResource().getIdlingResource().setIdleState(true)
-                }
                 CircularIndeterminateProgressBar(it)
             }
             bitcoinPrice.value?.let {

@@ -8,9 +8,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.idling.CountingIdlingResource
 import com.gv.composetestdemo.ViewModel.UserListViewModel
 import com.gv.composetestdemo.ui.UserList
 import com.gv.composetestdemo.ui.theme.ComposetestdemoTheme
+import com.gv.myapplication.moduleA.CountIdlingResource
 import com.gv.myapplication.moduleA.SimpleIdlingResource
 
 class MainActivity : ComponentActivity() {
@@ -32,7 +34,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @VisibleForTesting
-    fun getIdlingResource(): SimpleIdlingResource {
+    fun getIdlingResource(): CountingIdlingResource {
 
         return SimpleIdlingResource().getIdlingResource()
     }

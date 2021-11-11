@@ -47,24 +47,30 @@ class UserFetcher @Inject constructor() {
     fun getUsers() {
         val request = Request.Builder().url(API_URL).build()
 
-        val countDownLatch = CountDownLatch(1)
-        SimpleIdlingResource().getIdlingResource().setIdleState(false)
+//        val countDownLatch = CountDownLatch(1)
+        Log.d("TestStatus","GetUsser Idl set false:  before :" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+//        SimpleIdlingResource().getIdlingResource().setIdleState(false)
+        SimpleIdlingResource().increment()
+        Log.d("TestStatus","GetUsser Idla fterset false : after -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
         _loading.value = (true)
 
         client.newCall(request = request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-
-                countDownLatch.countDown()
+                SimpleIdlingResource().decrement()
+//                countDownLatch.countDown()
             }
 
             override fun onResponse(call: Call, response: Response) {
 
                 val responseResult = gson.fromJson(response.body?.string(), UserResponse::class.java)
                 Log.d("UserFetcher", responseResult.toString())
-                countDownLatch.countDown()
+//                countDownLatch.countDown()
                 _userResponse.postValue(responseResult)
                 _loading.postValue(false)
-                SimpleIdlingResource().getIdlingResource().setIdleState(true)
+                Log.d("TestStatus","GetUsser Idl set true : before -" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+//                SimpleIdlingResource().getIdlingResource().setIdleState(true)
+                SimpleIdlingResource().decrement()
+                Log.d("TestStatus","GetUsser Idl afterset TRUE :aft - " +SimpleIdlingResource.countingIdlingResource.isIdleNow)
             }
         })
 
@@ -78,23 +84,30 @@ class UserFetcher @Inject constructor() {
 
     fun getUserImage() {
         val request = Request.Builder().url(IMAGE_URL).build()
-        SimpleIdlingResource().getIdlingResource().setIdleState(false)
+        Log.d("TestStatus","GetUsserImage Idl set false : befor - " +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+//        SimpleIdlingResource().getIdlingResource().setIdleState(false)
+        SimpleIdlingResource().increment()
+        Log.d("TestStatus","GetUsserImage Idl afterset false :aft - " +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+//        val countDownLatch = CountDownLatch(1)
         _loading.value = (true)
 
-        val countDownLatch = CountDownLatch(1)
 
         client.newCall(request = request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                countDownLatch.countDown()
+//                countDownLatch.countDown()
+//                SimpleIdlingResource().getIdlingResource().setIdleState(true)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val responseResult = gson.fromJson(response.body?.string(), UserImage::class.java)
                 Log.d("UserFetcher", responseResult.toString())
-                countDownLatch.countDown()
+                Log.d("TestStatus","GetUsserImage Idl set TRUE : before" +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+//                SimpleIdlingResource().getIdlingResource().setIdleState(true)
+                SimpleIdlingResource().decrement()
+                Log.d("TestStatus","GetUsserImage Idl after set TRUE : after - " +SimpleIdlingResource.countingIdlingResource.isIdleNow)
+//                countDownLatch.countDown()
                 _userImage.postValue(responseResult)
                 _loading.postValue(false)
-                SimpleIdlingResource().getIdlingResource().setIdleState(true)
             }
         })
     }
